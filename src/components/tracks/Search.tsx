@@ -9,10 +9,33 @@ import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 
+import { useState } from "react";
+import axios from "axios";
+
 export default function Search() {
+  const [trackTitle, setTrackTitle] = useState("Search a song");
+
+  const findTrack = async (dispatch: any, e: any) => {
+    e.preventDefault();
+
+    if (e.target.value === "") return;
+
+    await axios
+      .get(
+        `https://fast-dawn-89938.herokuapp.com/http://api.musixmatch.com/ws/1.1/track.search?q_track=${trackTitle}&page_size=10&page=1&s_track_rating=desc&apikey=${process.env.REACT_APP_MM_KEY}`
+      )
+      .then((res) =>
+        dispatch({
+          type: "SEARCH_TRACKS",
+          payload: res.data.message.body.track_list,
+        })
+      )
+      .catch((err) => console.log(err));
+  };
+
   return (
     <Consumer>
-      {(value) => {
+      {({ dispatch }) => {
         return (
           <Card sx={{ minWidth: 275 }}>
             <CardContent
@@ -31,16 +54,20 @@ export default function Search() {
               </Typography>
             </CardContent>
             <CardActions style={{ justifyContent: "center" }}>
-              <form>
+              <form onSubmit={(e) => findTrack(dispatch, e)}>
                 <TextField
                   id="search-bar"
                   className="text"
                   // onInput={(e) => {
                   //   // setSearchQuery(e.target.value);
                   // }}
+                  onChange={(e) => {
+                    setTrackTitle(e.target.value);
+                  }}
                   label="Song title..."
                   variant="outlined"
                   placeholder="Search..."
+                  value={trackTitle}
                   size="small"
                 />
                 <IconButton type="submit" aria-label="search">

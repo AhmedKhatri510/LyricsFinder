@@ -3,13 +3,28 @@ import axios from "axios";
 
 export const Context = React.createContext<any>(null);
 
+const reducer = (state: any, action: any) => {
+  switch (action.type) {
+    case "SEARCH_TRACKS":
+      return {
+        ...state,
+        track_list: action.payload,
+        heading: "Search Result",
+      };
+
+    default:
+      return state;
+  }
+};
+
 export class Provider extends Component<
   { children: any },
   { track_list: Object[]; heading: string }
 > {
   state = {
     track_list: [],
-    heading: "Top 10 tracks",
+    heading: "Top 10 Tracks",
+    dispatch: (action: any) => this.setState((state) => reducer(state, action)),
   };
   //
   //https://cors-anywhere.herokuapp.com/
